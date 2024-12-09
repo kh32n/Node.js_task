@@ -109,3 +109,13 @@ exports.loginUser = (req, res) => {
         });
     });
 };
+
+exports.search = (req,res) => {
+    const { name } = req.params;
+    User.searchUser(name,(err,users) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+
+        res.status(200).json(users);
+    })
+
+}

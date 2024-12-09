@@ -6,7 +6,7 @@ document.getElementById('userForm').addEventListener('submit', addUser);
 
 //検索ボタンがクリックされた際に、searchButton のイベントリスナーを使って入力された検索条件を取得します。
 // TODO 検索ロジックの作成
-//document.getElementById('serch_form').addEventListener('submit', );
+//document.getElementById('search_form').addEventListener('submit', );
 
 // ユーザーを追加するための関数
 // `e` はイベントオブジェクトを表し、フォーム送信時のデフォルト動作を防止するために使用する

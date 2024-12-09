@@ -72,6 +72,11 @@ const User = {
 
         // クエリを実行し、結果をコールバック関数に渡す
         db.query(query, [id], callback);
+    },
+    searchUser: (data) =>{
+        const query = 'SELECT * FROM users WHERE name LIKE ? OR email LIKE ?'
+
+        db.query(query,[data,data],callback);
     }
 };
 
