@@ -73,11 +73,15 @@ const User = {
         // クエリを実行し、結果をコールバック関数に渡す
         db.query(query, [id], callback);
     },
-    searchUser: (data) =>{
-        const query = 'SELECT * FROM users WHERE name LIKE ? OR email LIKE ?'
+    searchUser: (query, callback) => {
+        const sql = `SELECT * FROM users WHERE name LIKE ? OR email LIKE ?`;
+        const values = [`%${query}%`, `%${query}%`];
 
-        db.query(query,[data,data],callback);
-    }
+        db.query(sql, values, (err, results) => {
+            if (err) return callback(err, null);
+            callback(null, results); // エラーがなければ結果を返す
+        });
+    },
 };
 
 // `User` オブジェクトをエクスポートし、他のファイルで使用できるようにする

@@ -37,7 +37,6 @@ exports.getUsers = (req, res) => {
     User.findAll((err, users) => {
         // データベース操作中にエラーが発生した場合のエラーハンドリング
         if (err) return res.status(500).json({ error: err });
-
         // 正常にユーザーが取得できた場合、JSON形式でユーザー情報を返す
         res.status(200).json(users);
     });
@@ -110,11 +109,14 @@ exports.loginUser = (req, res) => {
     });
 };
 
-exports.search = (req,res) => {
-    const { name } = req.params;
-    User.searchUser(name,(err,users) => {
-        if (err) return res.status(500).json({ error: 'Database error' });
+exports.search = (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        return res.status(400).send({ error: '検索条件が必要です' });
+    }
 
+    User.searchUser(query, (err, users) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
         res.status(200).json(users);
     })
 

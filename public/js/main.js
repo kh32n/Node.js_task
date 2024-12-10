@@ -6,8 +6,37 @@ document.getElementById('userForm').addEventListener('submit', addUser);
 
 //検索ボタンがクリックされた際に、searchButton のイベントリスナーを使って入力された検索条件を取得します。
 // TODO 検索ロジックの作成
-//document.getElementById('search_form').addEventListener('submit', );
+document.getElementById('searchButton').addEventListener('click', searchUser);
 
+
+async function searchUser() {
+    let query = document.getElementById("searchInput").value;
+    const res = await fetch(`http://localhost:3000/api/users/search?query=${encodeURIComponent(query)}`);
+    let userData = await res.json();
+    // alert(JSON.stringify(userData)) デバッグ用
+    const userList = document.getElementById('searchList');
+    // console.log(userData)
+    // 現在のユーザーリスト表示をクリア（古いリストを消去）
+    userList.innerHTML = '';
+
+    userData.forEach(user => {
+        // ユーザー情報を格納する `<li>` 要素を作成
+        const li = document.createElement('li');
+
+
+        // リストアイテムの内容を設定
+        // ユーザー名、メールアドレス、更新リンク、および削除ボタンを表示
+        li.innerHTML = `
+            ${user.name} (${user.email})    <!-- ユーザー名とメールアドレスを表示 -->
+            <a href="update.html?id=${user.id}">Update</a>    <!-- 更新用リンク。クリックすると update.html ページに移動し、指定されたユーザーIDの編集が可能 -->
+            <button onclick="deleteUser(${user.id})">Delete</button>    <!-- 削除ボタン。クリックすると deleteUser 関数が実行され、ユーザーが削除される -->
+        `;
+
+        // 作成した `<li>` 要素をユーザーリストの表示要素に追加
+        userList.appendChild(li);
+    });
+
+}
 // ユーザーを追加するための関数
 // `e` はイベントオブジェクトを表し、フォーム送信時のデフォルト動作を防止するために使用する
 function addUser(e) {
@@ -27,17 +56,17 @@ function addUser(e) {
         email: email,     // メールアドレス
         password: password // パスワード
     })
-    .then(response => {
-        // サーバーからのレスポンスを受け取ったら、ユーザーが正常に追加されたことを示すメッセージを表示
-        alert(response.data.message);
+        .then(response => {
+            // サーバーからのレスポンスを受け取ったら、ユーザーが正常に追加されたことを示すメッセージを表示
+            alert(response.data.message);
 
-        // 新しいユーザーが追加されたので、最新のユーザーリストを取得して表示
-        getUsers();
-    })
-    .catch(error => {
-        // リクエスト中にエラーが発生した場合は、エラーメッセージをコンソールに表示
-        console.error('Error:', error);
-    });
+            // 新しいユーザーが追加されたので、最新のユーザーリストを取得して表示
+            getUsers();
+        })
+        .catch(error => {
+            // リクエスト中にエラーが発生した場合は、エラーメッセージをコンソールに表示
+            console.error('Error:', error);
+        });
 }
 
 // すべてのユーザーを取得して、ユーザーリストを表示する関数
