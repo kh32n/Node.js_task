@@ -5,8 +5,29 @@
 document.getElementById('userForm').addEventListener('submit', addUser);
 
 //検索ボタンがクリックされた際に、searchButton のイベントリスナーを使って入力された検索条件を取得します。
-// TODO 検索ロジックの作成
-document.getElementById('searchButton').addEventListener('click', searchUser);
+//バリデーションの追加
+document.getElementById('searchButton').addEventListener('click', function () {
+    let isValid = true;
+    const text = document.getElementById('searchInput').value;
+    const textError = document.getElementById('errorMessage');
+    let reg = new RegExp(/[!"#$%&'()\*\+\-\,\/:;<=>?\[\\\]^_`{|}~]/g);
+    if (reg.test(text)) {
+        textError.textContent = "特殊な記号が入ってます。"
+        isValid = false;
+    }
+    else if (text.trim() === '') {
+        textError.textContent = '入力してください。';
+        isValid = false;
+    }
+    else {
+        textError.textContent = '';
+    }
+
+    if (isValid) {
+        searchUser();
+    }
+});
+
 
 
 async function searchUser() {
@@ -14,29 +35,35 @@ async function searchUser() {
     const res = await fetch(`http://localhost:3000/api/users/search?query=${encodeURIComponent(query)}`);
     let userData = await res.json();
     // alert(JSON.stringify(userData)) デバッグ用
-    const userList = document.getElementById('searchList');
-    // console.log(userData)
+    const userList = document.getElementById('resultList');
     // 現在のユーザーリスト表示をクリア（古いリストを消去）
     userList.innerHTML = '';
 
-    userData.forEach(user => {
-        // ユーザー情報を格納する `<li>` 要素を作成
+    if (userData.length === 0) {
+        // ユーザーがいない場合、該当するメッセージを表示
         const li = document.createElement('li');
-
-
-        // リストアイテムの内容を設定
-        // ユーザー名、メールアドレス、更新リンク、および削除ボタンを表示
-        li.innerHTML = `
+        li.innerHTML = '該当するユーザーが見つかりませんでした。';
+        userList.appendChild(li);
+    }
+    else {
+        userData.forEach(user => {
+            // ユーザー情報を格納する `<li>` 要素を作成
+            const li = document.createElement('li');
+            // リストアイテムの内容を設定
+            // ユーザー名、メールアドレス、更新リンク、および削除ボタンを表示
+            li.innerHTML = `
             ${user.name} (${user.email})    <!-- ユーザー名とメールアドレスを表示 -->
             <a href="update.html?id=${user.id}">Update</a>    <!-- 更新用リンク。クリックすると update.html ページに移動し、指定されたユーザーIDの編集が可能 -->
             <button onclick="deleteUser(${user.id})">Delete</button>    <!-- 削除ボタン。クリックすると deleteUser 関数が実行され、ユーザーが削除される -->
         `;
 
-        // 作成した `<li>` 要素をユーザーリストの表示要素に追加
-        userList.appendChild(li);
-    });
-
+            // 作成した `<li>` 要素をユーザーリストの表示要素に追加
+            userList.appendChild(li);
+        });
+    }
 }
+
+
 // ユーザーを追加するための関数
 // `e` はイベントオブジェクトを表し、フォーム送信時のデフォルト動作を防止するために使用する
 function addUser(e) {
